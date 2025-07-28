@@ -1,0 +1,117 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Cotizaciones</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-segment [(ngModel)]="segmentoActivo">
+    <ion-segment-button value="first" content-id="first">
+      <ion-label>Registrar</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="second" content-id="second">
+      <ion-label>Editar/Eliminar</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="third" content-id="third">
+      <ion-label>Ver</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <ion-segment-view>
+    <!-- Registrar -->
+    <ion-segment-content id="first">
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Nueva Cotización</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+
+          <!-- Cliente -->
+          <ion-item>
+            <ion-label>Cliente</ion-label>
+            <ion-select placeholder="Selecciona un cliente" [(ngModel)]="clienteSeleccionado" (ionChange)="verificarClienteSeleccionado()">
+              <ion-select-option *ngFor="let cliente of clientesDisponibles" [value]="cliente.nombre">
+                {{ cliente.nombre }}
+              </ion-select-option>
+              <ion-select-option value="otro">Otro...</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item *ngIf="clienteSeleccionado === 'otro'">
+            <ion-label position="floating">Nombre del nuevo cliente</ion-label>
+            <ion-input [(ngModel)]="nuevaCotizacion.cliente"></ion-input>
+          </ion-item>
+
+          <ion-item *ngIf="clienteSeleccionado !== 'otro'">
+            <ion-label position="floating">Cliente</ion-label>
+            <ion-input [(ngModel)]="nuevaCotizacion.cliente" [readonly]="true"></ion-input>
+          </ion-item>
+
+          <!-- Fecha -->
+          <ion-item>
+            <ion-label position="floating">Fecha</ion-label>
+            <ion-datetime display-format="YYYY-MM-DD" [(ngModel)]="nuevaCotizacion.fecha"></ion-datetime>
+          </ion-item>
+
+          <!-- Productos -->
+          <ng-container *ngFor="let producto of nuevaCotizacion.productos; let i = index">
+            <ion-item>
+              <ion-label>Producto {{ i + 1 }}</ion-label>
+              <ion-select placeholder="Selecciona un producto" [(ngModel)]="producto.id" (ionChange)="calcularTotal()">
+                <ion-select-option *ngFor="let p of productosDisponibles" [value]="p.id">
+                  {{ p.nombre }} - ${{ p.precio }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item>
+              <ion-label position="floating">Cantidad</ion-label>
+              <ion-input type="number" [(ngModel)]="producto.cantidad" (ionChange)="calcularTotal()"></ion-input>
+            </ion-item>
+          </ng-container>
+
+          <ion-button expand="block" (click)="agregarProducto()">+ Agregar otro producto</ion-button>
+
+          <!-- Total calculado -->
+          <ion-item lines="none" class="ion-margin-top">
+            <ion-label><strong>Total:</strong></ion-label>
+            <ion-text color="primary">${{ totalCotizacion }}</ion-text>
+          </ion-item>
+
+          <ion-button expand="block" color="success" (click)="registrarCotizacion()">Registrar Cotización</ion-button>
+        </ion-card-content>
+      </ion-card>
+    </ion-segment-content>
+
+    <!-- Editar/Eliminar -->
+    <ion-segment-content id="second">
+      <ion-card *ngFor="let cotizacion of cotizaciones">
+        <ion-card-header>
+          <ion-card-title>{{ cotizacion.cliente }}</ion-card-title>
+          <ion-card-subtitle>{{ cotizacion.fecha }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>Total:</strong> ${{ cotizacion.total }}</p>
+          <ion-button color="danger" (click)="eliminarCotizacion(cotizacion.id)">Eliminar</ion-button>
+        </ion-card-content>
+      </ion-card>
+    </ion-segment-content>
+
+    <!-- Ver -->
+    <ion-segment-content id="third">
+      <ion-card *ngFor="let cotizacion of cotizaciones">
+        <ion-card-header>
+          <ion-card-title>{{ cotizacion.cliente }}</ion-card-title>
+          <ion-card-subtitle>{{ cotizacion.fecha }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>Total:</strong> ${{ cotizacion.total }}</p>
+          <ul>
+            <li *ngFor="let prod of cotizacion.productos">
+              {{ prod.nombre }} - {{ prod.cantidad }} unidades
+            </li>
+          </ul>
+        </ion-card-content>
+      </ion-card>
+    </ion-segment-content>
+  </ion-segment-view>
+</ion-content>

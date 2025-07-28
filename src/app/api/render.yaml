@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: api-inventario
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DB_HOST
+        value: btr8n8akqwxc6vnomsix-mysql.services.clever-cloud.com
+      - key: DB_USER
+        value: uii9rcdb3molmlqn
+      - key: DB_PASSWORD
+        value: 9eI5GAXdJtQIO9SuT43O
+      - key: DB_NAME
+        value: btr8n8akqwxc6vnomsix
